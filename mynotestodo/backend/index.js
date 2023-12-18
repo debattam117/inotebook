@@ -8,6 +8,9 @@ connectToMongo();
 const app = express()
 const port = 3001
 
+app.use(express.json());//I have used a middle ware to send body as request from the link.
+
+
 //available routes
 
 app.use('/api/auth',require('./Routes/auth'))
