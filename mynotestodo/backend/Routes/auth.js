@@ -4,16 +4,22 @@ const User=require('../models/User.js');
 const { body, validationResult } = require('express-validator');
 
 //create a user using post 
-router. post ('/',[
+router. post ('/createuser',[
 
-body('name').isLength({min:3}),
-body('email').isEmail(),
-body('password').isLength({min:5}),
+body('name','Enter a valid name').isLength({min:3}),
+body('email','Enter a valid email').isEmail(),
+body('password','Password must be 5 char in length').isLength({min:5}),
 
 ] , async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
+    }
+
+    let user1=await User.findOne({email:req.body.email})
+    if(user1)
+    {
+        return res.status(400).json({ errors: "Sorry a user with this mail already exist" });
     }
 
     try {
@@ -25,7 +31,7 @@ body('password').isLength({min:5}),
         res.json(newUser);
     } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error');
+        res.status(500).send('Servers Error');
     }
 });
 
@@ -139,6 +145,12 @@ Finally, it exports the router with all defined routes and middleware.
 This code essentially sets up an Express route to create a new user with validation checks for name, email, and password lengths, and it uses async/await for handling asynchronous operations like database interactions
 
 
+
+{
+"name":"",
+"email":"debattam117gmail.com",
+"password":"dsadsdfdv"
+}
 
 
 

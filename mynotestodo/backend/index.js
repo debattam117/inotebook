@@ -6,7 +6,7 @@ connectToMongo();
 
 
 const app = express()
-const port = 3001
+const port = 5000
 
 app.use(express.json());//I have used a middle ware to send body as request from the link.
 
