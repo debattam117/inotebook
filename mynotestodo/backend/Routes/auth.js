@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User=require('../models/User.js');
 const { body, validationResult } = require('express-validator');
+const bcrypt=require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+const JWT_SECRET="IamDebu@123";
 //create a user using post 
 router. post ('/createuser',[
 
@@ -21,14 +24,30 @@ body('password','Password must be 5 char in length').isLength({min:5}),
     {
         return res.status(400).json({ errors: "Sorry a user with this mail already exist" });
     }
+    
+    const salt=await bcrypt.genSalt(10);//It is generating some random alphanumeric word
+    const secPass= await bcrypt.hash(req.body.password,salt);//this code is combining our real password and salt and then converting it into hash
 
     try {
         const newUser = await User.create({
             name: req.body.name,
-            password: req.body.password,
+            password: secPass,
             email: req.body.email
         });
-        res.json(newUser);
+
+        const data=
+        {
+            user:{
+                id:User.id
+            }
+        }
+        const authtoken= jwt.sign(data,JWT_SECRET);
+        //console.log(authtoken);
+
+        res.json({authtoken});
+
+        //res.json(newUser);
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Servers Error');
