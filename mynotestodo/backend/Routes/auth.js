@@ -38,7 +38,7 @@ body('password','Password must be 5 char in length').isLength({min:5}),
         const data=
         {
             user:{
-                id:User.id
+                id:newUser.id
             }
         }
         const authtoken= jwt.sign(data,JWT_SECRET);
@@ -58,6 +58,67 @@ body('password','Password must be 5 char in length').isLength({min:5}),
 //which can make error handling clearer and more straightforward. 
 //If you're encountering an error regarding try expectations, this updated code structure should resolve that problem.
     
+
+
+
+
+
+router. post ('/login',[
+
+    body('email','Enter a valid email').isEmail(),
+    body('password','Password cannot be blank').exists(),//If we are using password here  body('password',....
+    
+    ] , async (req, res) => {
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const {email,password}=req.body;//then we have to use password here also i.e the full   ''password'' word
+       
+        try{
+            
+            let user=await User.findOne({email});
+            if(!user)
+            {
+                return res.status(400).json({ errors: "please try to login with correct credentials" });
+            }
+
+            const passwordCompare=await bcrypt.compare(password,user.password);//And the word ''password'' here should be the same 
+            if(!passwordCompare)
+            {
+                return res.status(400).json({ errors: "please try to login with correct credentials" });
+            }
+
+            const data=
+            {
+                user:{
+                    id:user.id,
+                    pass:user.password,
+                    name:user.name
+
+                }
+            }
+            const a=data.user.id;
+            const authtoken= jwt.sign(data,JWT_SECRET);
+            //console.log(authtoken);
+    
+            res.json({a,data,authtoken});
+    
+
+        }
+        catch(err)
+        {
+            console.error(err);
+            res.status(500).send('Servers Error');
+        }
+
+
+
+
+
+    })
     
 module.exports = router
 
@@ -170,6 +231,49 @@ This code essentially sets up an Express route to create a new user with validat
 "email":"debattam117gmail.com",
 "password":"dsadsdfdv"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+The syntax you provided is a part of Express.js, a popular web framework for Node.js. Specifically, this code is defining a route in Express using the post method for the "/login" endpoint. The syntax is as follows:
+
+javascript
+Copy code
+router.post('/login', [
+    body('email', 'Enter a valid email').isEmail(),
+    body('password', 'Password cannot be blank').exists(),
+], async (req, res) => {
+    // Route handling logic
+});
+Here's a breakdown:
+
+router.post('/login', ...) defines a route that will handle HTTP POST requests to the "/login" endpoint.
+
+The second parameter, [body('email', 'Enter a valid email').isEmail(), body('password', 'Password cannot be blank').exists()], 
+
+specifies an array of middleware functions. In this case, it's using the express-validator middleware to validate the request body.
+
+body('email', 'Enter a valid email').isEmail(): Checks if the "email" field in the request body is a valid email address.
+
+body('password', 'Password cannot be blank').exists(): Checks if the "password" field exists in the request body.
+
+The third parameter, async (req, res) => { ... }, is an asynchronous function that contains the logic to handle the POST request.
+
+In summary, this code is defining a route for handling login requests, and it includes middleware for input validation using express-validator. The middleware checks that the "email" field is a valid email and that the "password" field exists in the request body. If validation passes, the route handling logic inside the asynchronous function is executed.
+
+
+
+
 
 
 
