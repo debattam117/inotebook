@@ -1,131 +1,128 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const User=require('../models/User.js');
-const { body, validationResult } = require('express-validator');
-const bcrypt=require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const User = require("../models/User.js");
+const { body, validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
+var jwt = require("jsonwebtoken");
+const JWT_SECRET = "IamDebu@123";
+var fetchuser = require("../middleware/fetchuser");
 
-const JWT_SECRET="IamDebu@123";
-//create a user using post 
-router. post ('/createuser',[
-
-body('name','Enter a valid name').isLength({min:3}),
-body('email','Enter a valid email').isEmail(),
-body('password','Password must be 5 char in length').isLength({min:5}),
-
-] , async (req, res) => {
+////Route:1 create a user using post
+router.post(
+  "/createuser",
+  [
+    body("name", "Enter a valid name").isLength({ min: 3 }),
+    body("email", "Enter a valid email").isEmail(),
+    body("password", "Password must be 5 char in length").isLength({ min: 5 }),
+  ],
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    let user1=await User.findOne({email:req.body.email})
-    if(user1)
-    {
-        return res.status(400).json({ errors: "Sorry a user with this mail already exist" });
+    let user1 = await User.findOne({ email: req.body.email });
+    if (user1) {
+      return res
+        .status(400)
+        .json({ errors: "Sorry a user with this mail already exist" });
     }
-    
-    const salt=await bcrypt.genSalt(10);//It is generating some random alphanumeric word
-    const secPass= await bcrypt.hash(req.body.password,salt);//this code is combining our real password and salt and then converting it into hash
+
+    const salt = await bcrypt.genSalt(10); //It is generating some random alphanumeric word
+    const secPass = await bcrypt.hash(req.body.password, salt); //this code is combining our real password and salt and then converting it into hash
 
     try {
-        const newUser = await User.create({
-            name: req.body.name,
-            password: secPass,
-            email: req.body.email
-        });
+      const newUser = await User.create({
+        name: req.body.name,
+        password: secPass,
+        email: req.body.email,
+      });
 
-        const data=
-        {
-            user:{
-                id:newUser.id
-            }
-        }
-        const authtoken= jwt.sign(data,JWT_SECRET);
-        //console.log(authtoken);
+      const data = {
+        user: {
+          id: newUser.id,
+        },
+      };
+      const authtoken = jwt.sign(data, JWT_SECRET);
+      //console.log(authtoken);
 
-        res.json({authtoken});
+      res.json({ authtoken });
 
-        //res.json(newUser);
-
+      //res.json(newUser);
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Servers Error');
+      console.error(err);
+      res.status(500).send("Servers Error");
     }
+  }
+);
+
+//This code uses async/await for handling the User.create() promise,
+//which can make error handling clearer and more straightforward.
+//If you're encountering an error regarding try expectations, this updated code structure should resolve that problem.
+
+//Route:2 Login
+
+router.post(
+  "/login",
+  [
+    body("email", "Enter a valid email").isEmail(),
+    body("password", "Password cannot be blank").exists(), //If we are using password here  body('password',....
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, password } = req.body; //then we have to use password here also i.e the full   ''password'' word
+
+    try {
+      let user = await User.findOne({ email });
+      if (!user) {
+        return res
+          .status(400)
+          .json({ errors: "please try to login with correct credentials" });
+      }
+
+      const passwordCompare = await bcrypt.compare(password, user.password); //And the word ''password'' here should be the same
+      if (!passwordCompare) {
+        return res
+          .status(400)
+          .json({ errors: "please try to login with correct credentials" });
+      }
+
+      const data = {
+        user: {
+          id: user.id,
+          pass: user.password,
+          name: user.name,
+        },
+      };
+      const a = data.user.id;
+      const authtoken = jwt.sign(data, JWT_SECRET);
+      //console.log(authtoken);
+
+      res.json({ a, data, authtoken });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Servers Error");
+    }
+  }
+);
+
+// ROUTE 3: Get loggedin User Details using: POST "/api/auth/getuser". Login required
+router.post("/getuser", fetchuser, async (req, res) => {
+  try {
+    userId = req.user.id;
+    const user = await User.findById(userId).select("-password");
+    res.send(user);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
-//This code uses async/await for handling the User.create() promise, 
-//which can make error handling clearer and more straightforward. 
-//If you're encountering an error regarding try expectations, this updated code structure should resolve that problem.
-    
-
-
-
-
-
-router. post ('/login',[
-
-    body('email','Enter a valid email').isEmail(),
-    body('password','Password cannot be blank').exists(),//If we are using password here  body('password',....
-    
-    ] , async (req, res) => {
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
-        const {email,password}=req.body;//then we have to use password here also i.e the full   ''password'' word
-       
-        try{
-            
-            let user=await User.findOne({email});
-            if(!user)
-            {
-                return res.status(400).json({ errors: "please try to login with correct credentials" });
-            }
-
-            const passwordCompare=await bcrypt.compare(password,user.password);//And the word ''password'' here should be the same 
-            if(!passwordCompare)
-            {
-                return res.status(400).json({ errors: "please try to login with correct credentials" });
-            }
-
-            const data=
-            {
-                user:{
-                    id:user.id,
-                    pass:user.password,
-                    name:user.name
-
-                }
-            }
-            const a=data.user.id;
-            const authtoken= jwt.sign(data,JWT_SECRET);
-            //console.log(authtoken);
-    
-            res.json({a,data,authtoken});
-    
-
-        }
-        catch(err)
-        {
-            console.error(err);
-            res.status(500).send('Servers Error');
-        }
-
-
-
-
-
-    })
-    
-module.exports = router
-
-
-
-
-
+module.exports = router;
 
 // const result = validationResult(req);
 // if (result.isEmpty()) {
@@ -137,9 +134,6 @@ module.exports = router
 //     email: req.body.email
 // }).then(user => res.json(user));
 
-
-
-
 // obj = {
 //     a: 'thios',
 //     number: 34
@@ -147,8 +141,6 @@ module.exports = router
 
 //     res.json (obj)//returning the json object as response
 //     console.log(req.body);
-
-
 
 /*
 
@@ -277,4 +269,4 @@ In summary, this code is defining a route for handling login requests, and it in
 
 
 
-*/ 
+*/
