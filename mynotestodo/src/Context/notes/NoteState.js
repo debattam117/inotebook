@@ -60,17 +60,17 @@ const NoteState =(props)=>{
 
     const addNote=(title,description,tag)=>{
      //TODO : API Calls
-
+      console.log("Note added")
       const note={
-        "_id": "65a8d32049ccce076faa8e535",
+        "_id": "65a8d32049ccce076faa8e535s322",
         "user": "65a540e14627e42008e51c811",
-        "title": "morning note",
-        "description": "please wake up early",
-        "tag": "personal",
+        "title": title,
+        "description": description,
+        "tag": tag,
         "date": "2024-01-18T07:28:32.704Z",
         "__v": 0
       };
-      setNotes(notes.push(note))
+      setNotes(notes.concat(note))
 
     }
 
