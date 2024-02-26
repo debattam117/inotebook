@@ -7,7 +7,7 @@ const Notes = () => {
 
     const context= useContext(noteContext);
     // eslint-disable-next-line
-    const{notes,setNotes,addNote}=context;
+    const{notes,getNote}=context;
 
   return (
     <>
