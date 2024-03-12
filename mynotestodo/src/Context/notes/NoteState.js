@@ -13,7 +13,7 @@ const NoteState =(props)=>{
 
 //Fetch all Note
 
-const getNote= async(title,description,tag)=>{
+const getNote= async()=>{
 
   const response = await fetch(`${host}/api/notes/fetchallnotes`, {
     method: 'GET',
@@ -26,13 +26,14 @@ const getNote= async(title,description,tag)=>{
   
    const json=await response.json();
    console.log(json);
+   setNotes(json)
 }
     //Add Note
 
     const addNote= async(title,description,tag)=>{
 
       const response = await fetch(`${host}/api/notes/addnote`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjVhNTQwZTE0NjI3ZTQyMDA4ZTUxYzgxIiwicGFzcyI6IiQyYSQxMCRqN0NJSmNqaUIyR2pvbzZyTkdhOFguaXp1Ymc1TE15UEUwL1UvT1BSLnhiVGQwVUE4ZUZFTyIsIm5hbWUiOiJkaXAifSwiaWF0IjoxNzA1Mzg5NTI4fQ.6dd1Nx8cN6tdPnjf69WKJB75vYdhifS0baL9SC-qCAc"
@@ -41,17 +42,19 @@ const getNote= async(title,description,tag)=>{
       });
       
      //TODO : API Calls
-      console.log("Note added")
-      const note={
-        "_id": "65a8d32049ccce076faa8e535s322",
-        "user": "65a540e14627e42008e51c811",
-        "title": title,
-        "description": description,
-        "tag": tag,
-        "date": "2024-01-18T07:28:32.704Z",
-        "__v": 0
-      };
-      setNotes(notes.concat(note))
+      // console.log("Note added")
+      // const note={
+      //   "_id": "65a8d32049ccce076faa8e535s322",
+      //   "user": "65a540e14627e42008e51c811",
+      //   "title": title,
+      //   "description": description,
+      //   "tag": tag,
+      //   "date": "2024-01-18T07:28:32.704Z",
+      //   "__v": 0
+      // };
+
+      // const note = await response.json();
+      // setNotes(notes.concat(note))
 
     }
 
@@ -62,7 +65,7 @@ const getNote= async(title,description,tag)=>{
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          "auth-token": "YOUR_AUTH_TOKEN"
+          "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjVhNTQwZTE0NjI3ZTQyMDA4ZTUxYzgxIiwicGFzcyI6IiQyYSQxMCRqN0NJSmNqaUIyR2pvbzZyTkdhOFguaXp1Ymc1TE15UEUwL1UvT1BSLnhiVGQwVUE4ZUZFTyIsIm5hbWUiOiJkaXAifSwiaWF0IjoxNzA1Mzg5NTI4fQ.6dd1Nx8cN6tdPnjf69WKJB75vYdhifS0baL9SC-qCAc"
         }
       });
       console.log("Delete node " + id);
