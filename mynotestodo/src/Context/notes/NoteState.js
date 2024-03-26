@@ -53,8 +53,8 @@ const getNote= async()=>{
       //   "__v": 0
       // };
 
-      // const note = await response.json();
-      // setNotes(notes.concat(note))
+      const note = await response.json();
+      setNotes(notes.concat(note))
 
     }
 
@@ -81,7 +81,7 @@ const getNote= async()=>{
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          "auth-token": "YOUR_AUTH_TOKEN"
+          "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjVhNTQwZTE0NjI3ZTQyMDA4ZTUxYzgxIiwicGFzcyI6IiQyYSQxMCRqN0NJSmNqaUIyR2pvbzZyTkdhOFguaXp1Ymc1TE15UEUwL1UvT1BSLnhiVGQwVUE4ZUZFTyIsIm5hbWUiOiJkaXAifSwiaWF0IjoxNzA1Mzg5NTI4fQ.6dd1Nx8cN6tdPnjf69WKJB75vYdhifS0baL9SC-qCAc"
         },
         body: JSON.stringify({ title, description, tag })
       });
@@ -98,6 +98,7 @@ const getNote= async()=>{
           break;
         }
       }
+      
       setNotes(newNotes);
     }
     
