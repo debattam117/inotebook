@@ -68,6 +68,8 @@ const getNote= async()=>{
           "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjVhNTQwZTE0NjI3ZTQyMDA4ZTUxYzgxIiwicGFzcyI6IiQyYSQxMCRqN0NJSmNqaUIyR2pvbzZyTkdhOFguaXp1Ymc1TE15UEUwL1UvT1BSLnhiVGQwVUE4ZUZFTyIsIm5hbWUiOiJkaXAifSwiaWF0IjoxNzA1Mzg5NTI4fQ.6dd1Nx8cN6tdPnjf69WKJB75vYdhifS0baL9SC-qCAc"
         }
       });
+      const json = await response.json();
+      console.log(json);
       console.log("Delete node " + id);
       const newNote = notes.filter((note) => note._id !== id);
       setNotes(newNote);
@@ -86,6 +88,7 @@ const getNote= async()=>{
         body: JSON.stringify({ title, description, tag })
       });
       const json = await response.json();
+      console.log(json);
     
       let newNotes = [...notes];
     
