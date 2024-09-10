@@ -2,9 +2,10 @@ import React , { useContext, useEffect, useRef,useState } from "react";
 import noteContext from '../Context/notes/noteContext';
 import Noteitem from "./Noteitem";
 import Addnote from './Addnote';
+import {  useNavigate } from 'react-router-dom';
 
 const Notes = () => {
-
+    let navigate = useNavigate();
     const context= useContext(noteContext);
     // eslint-disable-next-line
     const{notes,getNote}=context;
@@ -12,7 +13,13 @@ const Notes = () => {
     const[note,setNote]=useState({id:"",etitle:"",edescription:"",etag:"Default"})
 
     useEffect(()=>{
-       getNote()
+       if(localStorage.getItem('token'))
+       {
+        getNote()
+       }
+       else{
+        navigate("/login")
+       }
 // eslint-disable-next-line
     },[])
 
@@ -59,11 +66,11 @@ const Notes = () => {
                   <form className='my-3'>
                       <div className="mb-3">
                         <label htmlFor="title" className="form-label">Title</label>
-                        <input type="text" className="form-control" id="etitle" name="etitle" value={note.etitle} aria-describedby="emailHelp" onChange={onChange}/>
+                        <input type="text" className="form-control" id="etitle" name="etitle" value={note.etitle} minLength={5} required aria-describedby="emailHelp" onChange={onChange}/>
                       </div>
                       <div className="mb-3">
                         <label htmlFor="description" className="form-label">Description</label>
-                        <input type="text" className="form-control" id="edescription" name="edescription" value={note.edescription} onChange={onChange}/>
+                        <input type="text" className="form-control" id="edescription" name="edescription" value={note.edescription} minLength={5} required onChange={onChange}/>
                       </div>
                       <div className="mb-3">
                         <label htmlFor="tag" className="form-label">Tag</label>
@@ -75,7 +82,7 @@ const Notes = () => {
               </div>
               <div className="modal-footer">
                 <button ref={refClose} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" className="btn btn-primary" onClick={handleClick} >Update Note</button>
+                <button disabled={note.etitle.length<5 || note.edescription.length<5} type="button" className="btn btn-primary" onClick={handleClick} >Update Note</button>
               </div>
             </div>
           </div>
@@ -83,6 +90,9 @@ const Notes = () => {
 
       <div className="row my-3">
         <h1>Your Notes</h1>
+        <div className="container">
+        {notes.length===0 && "No notes to display "}
+        </div>
         {notes.map((note) => {
           return<Noteitem key={note._id}  updateNote={updateNote}  note={note}/>;
         })}

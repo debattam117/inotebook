@@ -45,8 +45,8 @@ router.post(
       };
       const authtoken = jwt.sign(data, JWT_SECRET);
       //console.log(authtoken);
-
-      res.json({ authtoken });
+      success=true;
+      res.json({ authtoken,success });
 
       //res.json(newUser);
     } catch (err) {
@@ -99,10 +99,10 @@ router.post(
         },
       };
       const a = data.user.id;
-      const authtoken = jwt.sign(data, JWT_SECRET);
+      const authtoken = jwt.sign(data, JWT_SECRET);//jwt.sign will give us the authtoken from our given data.
       //console.log(authtoken);
-
-      res.json({ a, data, authtoken });
+      success=true;
+      res.json({success, a, data, authtoken });
     } catch (err) {
       console.error(err);
       res.status(500).send("Servers Error");
